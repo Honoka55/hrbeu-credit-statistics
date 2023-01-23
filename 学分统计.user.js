@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         学分统计
-// @namespace    https://honoka55.github.io
-// @version      0.1
+// @namespace    https://github.com/Honoka55/hrbeu-credit-statistics
+// @version      0.2
 // @description  自动统计课程学分
 // @author       Honoka55
 // @match        *://*.hrbeu.edu.cn/jwapp/sys/cjcx/*
@@ -61,19 +61,20 @@
     // 点击按钮时执行
     btn.onclick = function () {
         GM_xmlhttpRequest({
-            method: "POST",
-            url: "https://jwgl.wvpn.hrbeu.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
+            method: 'POST',
+            url: 'https://jwgl.wvpn.hrbeu.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do',
             headers: {
-                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
             },
             data: {
-                "querySetting":'[{"name":"SFYX","caption":"是否有效","linkOpt":"AND","builderList":"cbl_m_List","builder":"m_value_equal","value":"1","value_display":"是"},{"name":"SHOWMAXCJ","caption":"显示最高成绩","linkOpt":"AND","builderList":"cbl_String","builder":"equal","value":0,"value_display":"否"},{"name":"*order","value":"-XNXQDM,-KCH,-KXH","linkOpt":"AND","builder":"m_value_equal"}]',
-                "*order":"-XNXQDM,-KCH,-KXH",
-                "pageSize":200,
-                "pageNumber":1,
+                'querySetting':
+                    '[{"name":"SFYX","caption":"是否有效","linkOpt":"AND","builderList":"cbl_m_List","builder":"m_value_equal","value":"1","value_display":"是"},{"name":"SHOWMAXCJ","caption":"显示最高成绩","linkOpt":"AND","builderList":"cbl_String","builder":"equal","value":0,"value_display":"否"},{"name":"*order","value":"-XNXQDM,-KCH,-KXH","linkOpt":"AND","builder":"m_value_equal"}]',
+                '*order': '-XNXQDM,-KCH,-KXH',
+                'pageSize': 200,
+                'pageNumber': 1
             },
-            onload: function(response) {
-                let json=JSON.parse(response.responseText);
+            onload: function (response) {
+                let json = JSON.parse(response.responseText);
 
                 // 定义变量
                 let result = {};
@@ -84,12 +85,12 @@
                 // 遍历表格中的每一行
                 for (let key in json.datas.xscjcx.rows) {
                     let data = json.datas.xscjcx.rows[key];
-                    let courseNum = parseInt(data.KCH);//课程号
-                    let scoreText = data.XSZCJMC;//XS总成绩MC
-                    let category = data.KCLBDM_DISPLAY;//课程类别DM_DISPLAY
-                    let nature = data.KCXZDM_DISPLAY;//课程性质DM_DISPLAY
-                    let credit = data.XF;//学分
-                    let pass = data.SFJG_DISPLAY;//是否及格_DISPLAY
+                    let courseNum = parseInt(data.KCH); // 课程号
+                    let scoreText = data.XSZCJMC; // XS总成绩MC
+                    let category = data.KCLBDM_DISPLAY; // 课程类别DM_DISPLAY
+                    let nature = data.KCXZDM_DISPLAY; // 课程性质DM_DISPLAY
+                    let credit = data.XF; // 学分
+                    let pass = data.SFJG_DISPLAY; // 是否及格_DISPLAY
 
                     // 转化分数为数字
                     let score = 0;
@@ -163,9 +164,7 @@
                 };
                 div.appendChild(closeBtn);
                 document.body.appendChild(div);
-
             }
         });
     };
-
 })();
