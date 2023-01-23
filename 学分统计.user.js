@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         学分统计
 // @namespace    https://github.com/Honoka55/hrbeu-credit-statistics
-// @version      0.2
+// @version      0.21
 // @description  自动统计课程学分
 // @author       Honoka55
 // @match        *://*.hrbeu.edu.cn/jwapp/sys/cjcx/*
@@ -55,20 +55,21 @@
     // 创建按钮
     let btn = document.createElement('button');
     btn.innerHTML = '统计学分';
-    btn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index:99999;';
+    btn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 99999;';
     document.body.appendChild(btn);
 
     // 点击按钮时执行
     btn.onclick = function () {
+        let rurl = 'https://' + window.location.host + '/jwapp/sys/cjcx/modules/cjcx/xscjcx.do';
         GM_xmlhttpRequest({
             method: 'POST',
-            url: 'https://jwgl.wvpn.hrbeu.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do',
+            url: rurl,
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
             },
             data: {
                 'querySetting':
-                    '[{"name":"SFYX","caption":"是否有效","linkOpt":"AND","builderList":"cbl_m_List","builder":"m_value_equal","value":"1","value_display":"是"},{"name":"SHOWMAXCJ","caption":"显示最高成绩","linkOpt":"AND","builderList":"cbl_String","builder":"equal","value":0,"value_display":"否"},{"name":"*order","value":"-XNXQDM,-KCH,-KXH","linkOpt":"AND","builder":"m_value_equal"}]',
+                    '[{"name": "SFYX", "caption": "是否有效", "linkOpt": "AND", "builderList": "cbl_m_List", "builder": "m_value_equal", "value": "1", "value_display": "是"}, {"name": "SHOWMAXCJ", "caption": "显示最高成绩", "linkOpt": "AND", "builderList": "cbl_String", "builder": "equal", "value":0, "value_display": "否"}, {"name": "*order", "value": "-XNXQDM,-KCH,-KXH", "linkOpt": "AND", "builder": "m_value_equal"}]',
                 '*order': '-XNXQDM,-KCH,-KXH',
                 'pageSize': 200,
                 'pageNumber': 1
@@ -86,9 +87,9 @@
                 for (let key in json.datas.xscjcx.rows) {
                     let data = json.datas.xscjcx.rows[key];
                     let courseNum = parseInt(data.KCH); // 课程号
-                    let scoreText = data.XSZCJMC; // XS总成绩MC
-                    let category = data.KCLBDM_DISPLAY; // 课程类别DM_DISPLAY
-                    let nature = data.KCXZDM_DISPLAY; // 课程性质DM_DISPLAY
+                    let scoreText = data.XSZCJMC; // 学生总成绩名称
+                    let category = data.KCLBDM_DISPLAY; // 课程类别代码_DISPLAY
+                    let nature = data.KCXZDM_DISPLAY; // 课程性质代码_DISPLAY
                     let credit = data.XF; // 学分
                     let pass = data.SFJG_DISPLAY; // 是否及格_DISPLAY
 
@@ -104,7 +105,7 @@
                         score = 65;
                     } else if (scoreText === '不及格') {
                         score = 30;
-                    } else if (scoreText === '缺考') {
+                    } else if (scoreText === '缺考' || scoreText === '') {
                         score = 0;
                     } else {
                         score = parseFloat(scoreText);
@@ -153,7 +154,7 @@
                 text += '必修课加权平均：' + avg.toFixed(2) + '分<br>';
                 div.innerHTML = text;
 
-                div.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 10px; z-index:99999;';
+                div.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 10px; z-index: 99999;';
 
                 // 添加关闭按钮
                 let closeBtn = document.createElement('button');
