@@ -6,7 +6,7 @@
 // @author       Honoka55
 // @match        *://*.hrbeu.edu.cn/jwapp/sys/cjcx/*
 // @icon         https://avatars.githubusercontent.com/u/71088406?v=4
-// @grant        none
+// @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
 (function () {
@@ -60,97 +60,112 @@
 
     // 点击按钮时执行
     btn.onclick = function () {
-        // 定义变量
-        let result = {};
-        let total = 0;
-        let avg = 0;
-        let tcredit = 0;
-        let courseTypeCredit = { A: 0, A0: 0, B: 0, C: 0, D: 0, E: 0, F: 0 };
+        GM_xmlhttpRequest({
+            method: "POST",
+            url: "https://jwgl.wvpn.hrbeu.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+            },
+            data: {
+                "querySetting":'[{"name":"SFYX","caption":"是否有效","linkOpt":"AND","builderList":"cbl_m_List","builder":"m_value_equal","value":"1","value_display":"是"},{"name":"SHOWMAXCJ","caption":"显示最高成绩","linkOpt":"AND","builderList":"cbl_String","builder":"equal","value":0,"value_display":"否"},{"name":"*order","value":"-XNXQDM,-KCH,-KXH","linkOpt":"AND","builder":"m_value_equal"}]',
+                "*order":"-XNXQDM,-KCH,-KXH",
+                "pageSize":200,
+                "pageNumber":1,
+            },
+            onload: function(response) {
+                let json=JSON.parse(response.responseText);
 
-        let table = document.getElementById('pinnedtableqb-index-table');
-        let trs = table.getElementsByTagName('tr');
+                // 定义变量
+                let result = {};
+                let total = 0;
+                let avg = 0;
+                let tcredit = 0;
+                let courseTypeCredit = { A: 0, A0: 0, B: 0, C: 0, D: 0, E: 0, F: 0 };
+                // 遍历表格中的每一行
+                for (let key in json.datas.xscjcx.rows) {
+                    let data = json.datas.xscjcx.rows[key];
+                    let courseNum = parseInt(data.KCH);//课程号
+                    let scoreText = data.XSZCJMC;//XS总成绩MC
+                    let category = data.KCLBDM_DISPLAY;//课程类别DM_DISPLAY
+                    let nature = data.KCXZDM_DISPLAY;//课程性质DM_DISPLAY
+                    let credit = data.XF;//学分
+                    let pass = data.SFJG_DISPLAY;//是否及格_DISPLAY
 
-        // 遍历表格中的每一行
-        for (let i = 0; i < trs.length; i++) {
-            let tds = trs[i].getElementsByTagName('td');
-            let courseNum = parseInt(tds[4].textContent);
-            let scoreText = tds[5].textContent;
-            let category = tds[7].textContent;
-            let nature = tds[8].textContent;
-            let credit = parseFloat(tds[9].textContent);
-            let pass = tds[19].textContent;
+                    // 转化分数为数字
+                    let score = 0;
+                    if (scoreText === '优秀') {
+                        score = 95;
+                    } else if (scoreText === '良好') {
+                        score = 85;
+                    } else if (scoreText === '中等') {
+                        score = 75;
+                    } else if (scoreText === '及格') {
+                        score = 65;
+                    } else if (scoreText === '不及格') {
+                        score = 30;
+                    } else if (scoreText === '缺考') {
+                        score = 0;
+                    } else {
+                        score = parseFloat(scoreText);
+                    }
 
-            // 转化分数为数字
-            let score = 0;
-            if (scoreText === '优秀') {
-                score = 95;
-            } else if (scoreText === '良好') {
-                score = 85;
-            } else if (scoreText === '中等') {
-                score = 75;
-            } else if (scoreText === '及格') {
-                score = 65;
-            } else if (scoreText === '不及格') {
-                score = 30;
-            } else if (scoreText === '缺考') {
-                score = 0;
-            } else {
-                score = parseFloat(scoreText);
-            }
+                    // 统计课程类别的学分总和
+                    if (!result[category]) {
+                        result[category] = 0;
+                    }
+                    if (pass === '是') {
+                        result[category] += credit;
+                    }
 
-            // 统计课程类别的学分总和
-            if (!result[category]) {
-                result[category] = 0;
-            }
-            if (pass === '是') {
-                result[category] += credit;
-            }
+                    for (let key in courseTypeList) {
+                        if ((courseTypeList[key].includes(courseNum) || category.includes(`（${key}）`)) && pass === '是') {
+                            courseTypeCredit[key] += credit;
+                        }
+                    }
 
-            for (let key in courseTypeList) {
-                if ((courseTypeList[key].includes(courseNum) || category.includes(`（${key}）`)) && pass === '是') {
-                    courseTypeCredit[key] += credit;
+                    // 统计必修课的按学分加权的平均分
+                    if (nature === '必修') {
+                        total += score * credit;
+                        tcredit += credit;
+                    }
+                    // 计算平均分
+                    if (tcredit !== 0) {
+                        avg = total / tcredit;
+                    }
                 }
+
+                // 添加一个元素显示统计结果
+                let div = document.createElement('div');
+                let text = '<!--';
+                for (let key in result) {
+                    text += key + '：' + result[key] + '学分<br>';
+                }
+                text += '--><b>学分统计</b><hr>';
+                for (let key in courseTypeCredit) {
+                    text += key + '：' + courseTypeCredit[key] + '学分<br>';
+                }
+                let a2c = courseTypeCredit.A + courseTypeCredit.A0 + courseTypeCredit.B + courseTypeCredit.C;
+                text += 'A～C：' + a2c + '学分<br>';
+                text += '公选：' + (a2c + courseTypeCredit.D + courseTypeCredit.E + courseTypeCredit.F) + '学分<br>';
+                text += '专选：' + ((result['专业选修课程'] || 0) + (result['19跨专业选修类（G）'] || 0)) + '学分<br>';
+                text += '<hr>';
+                text += '必修课加权平均：' + avg.toFixed(2) + '分<br>';
+                div.innerHTML = text;
+
+                div.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 10px; z-index:99999;';
+
+                // 添加关闭按钮
+                let closeBtn = document.createElement('button');
+                closeBtn.innerHTML = '关闭';
+                closeBtn.style.cssText = 'float: right;';
+                closeBtn.onclick = function () {
+                    div.remove();
+                };
+                div.appendChild(closeBtn);
+                document.body.appendChild(div);
+
             }
-
-            // 统计必修课的按学分加权的平均分
-            if (nature === '必修') {
-                total += score * credit;
-                tcredit += credit;
-            }
-            // 计算平均分
-            if (tcredit !== 0) {
-                avg = total / tcredit;
-            }
-        }
-
-        // 添加一个元素显示统计结果
-        let div = document.createElement('div');
-        let text = '<!--';
-        for (let key in result) {
-            text += key + '：' + result[key] + '学分<br>';
-        }
-        text += '--><b>学分统计</b><hr>';
-        for (let key in courseTypeCredit) {
-            text += key + '：' + courseTypeCredit[key] + '学分<br>';
-        }
-        let a2c = courseTypeCredit.A + courseTypeCredit.A0 + courseTypeCredit.B + courseTypeCredit.C;
-        text += 'A～C：' + a2c + '学分<br>';
-        text += '公选：' + (a2c + courseTypeCredit.D + courseTypeCredit.E + courseTypeCredit.F) + '学分<br>';
-        text += '专选：' + ((result['专业选修课程'] || 0) + (result['19跨专业选修类（G）'] || 0)) + '学分<br>';
-        text += '<hr>';
-        text += '必修课加权平均：' + avg.toFixed(2) + '分<br>';
-        div.innerHTML = text;
-
-        div.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 10px; z-index:99999;';
-
-        // 添加关闭按钮
-        let closeBtn = document.createElement('button');
-        closeBtn.innerHTML = '关闭';
-        closeBtn.style.cssText = 'float: right;';
-        closeBtn.onclick = function () {
-            div.remove();
-        };
-        div.appendChild(closeBtn);
-        document.body.appendChild(div);
+        });
     };
+
 })();
