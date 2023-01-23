@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         学分统计
 // @namespace    https://github.com/Honoka55/hrbeu-credit-statistics
-// @version      0.21
+// @version      0.22
 // @description  自动统计课程学分
 // @author       Honoka55
 // @match        *://*.hrbeu.edu.cn/jwapp/sys/cjcx/*
@@ -55,8 +55,8 @@
     // 创建按钮
     let btn = document.createElement('button');
     btn.innerHTML = '统计学分';
-    btn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 99999;';
-    document.body.appendChild(btn);
+    btn.classList.add('bh-btn', 'bh-btn-primary');
+    btn.style.cssText = 'position: absolute; bottom: 10px; z-index: 99999;';
 
     // 点击按钮时执行
     btn.onclick = function () {
@@ -138,11 +138,8 @@
 
                 // 添加一个元素显示统计结果
                 let div = document.createElement('div');
-                let text = '<!--';
-                for (let key in result) {
-                    text += key + '：' + result[key] + '学分<br>';
-                }
-                text += '--><b>学分统计</b><hr>';
+                div.classList.add('bh-window');
+                let text = '<div class="head"><h3>学分统计</h3></div><hr style="border: none; border-top: 1px solid #efefef; margin-bottom: 10px;"><div class="content" style="padding: 0 20px;">';
                 for (let key in courseTypeCredit) {
                     text += key + '：' + courseTypeCredit[key] + '学分<br>';
                 }
@@ -150,16 +147,21 @@
                 text += 'A～C：' + a2c + '学分<br>';
                 text += '公选：' + (a2c + courseTypeCredit.D + courseTypeCredit.E + courseTypeCredit.F) + '学分<br>';
                 text += '专选：' + ((result['专业选修课程'] || 0) + (result['19跨专业选修类（G）'] || 0)) + '学分<br>';
-                text += '<hr>';
-                text += '必修课加权平均：' + avg.toFixed(2) + '分<br>';
+                text += '<!--';
+                for (let key in result) {
+                    text += key + '：' + result[key] + '学分<br>';
+                }
+                text += '-->';
+                text += '<hr style="border: none; border-top: 1px solid #efefef; margin-bottom: 10px;">';
+                text += '必修课加权平均：' + avg.toFixed(2) + '分</div><br>';
                 div.innerHTML = text;
-
-                div.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 10px; z-index: 99999;';
+                div.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; width: 26em; z-index: 99999;';
 
                 // 添加关闭按钮
                 let closeBtn = document.createElement('button');
                 closeBtn.innerHTML = '关闭';
                 closeBtn.style.cssText = 'float: right;';
+                closeBtn.classList.add('bh-btn', 'bh-btn-small');
                 closeBtn.onclick = function () {
                     div.remove();
                 };
@@ -168,4 +170,13 @@
             }
         });
     };
+
+    // 检查 #tab 元素是否出现
+    let checkTab = setInterval(function () {
+        let tab = document.getElementById('tab');
+        if (tab) {
+            clearInterval(checkTab);
+            tab.appendChild(btn);
+        }
+    }, 100);
 })();
