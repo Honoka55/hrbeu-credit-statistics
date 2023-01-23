@@ -3,7 +3,7 @@ A credit statistics script designed for the new wisedu jwgl system.
 
 ## Introduction
 
-[Install this script](https://gcore.jsdelivr.net/gh/Honoka55/hrbeu-credit-statistics/学分统计.user.js)
+[Install this script](https://raw.githubusercontent.com/Honoka55/hrbeu-credit-statistics/main/学分统计.user.js)
 
 Open the jwgl system, click “统计学分” and enjoy.
 
