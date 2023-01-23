@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         学分统计
 // @namespace    https://github.com/Honoka55/hrbeu-credit-statistics
-// @version      0.22
+// @version      0.23
 // @description  自动统计课程学分
 // @author       Honoka55
 // @match        *://*.hrbeu.edu.cn/jwapp/sys/cjcx/*
@@ -155,13 +155,13 @@
                 text += '<hr style="border: none; border-top: 1px solid #efefef; margin-bottom: 10px;">';
                 text += '必修课加权平均：' + avg.toFixed(2) + '分</div><br>';
                 div.innerHTML = text;
-                div.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; width: 26em; z-index: 99999;';
+                div.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; width: 26em; box-shadow: 0 1px 4px #00000047; z-index: 99999;';
 
                 // 添加关闭按钮
                 let closeBtn = document.createElement('button');
                 closeBtn.innerHTML = '关闭';
                 closeBtn.style.cssText = 'float: right;';
-                closeBtn.classList.add('bh-btn', 'bh-btn-small');
+                closeBtn.classList.add('bh-btn');
                 closeBtn.onclick = function () {
                     div.remove();
                 };
