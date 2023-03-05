@@ -146,7 +146,7 @@
                 let a2c = courseTypeCredit.A + courseTypeCredit.A0 + courseTypeCredit.B + courseTypeCredit.C;
                 text += 'A～C：' + a2c + '学分<br>';
                 text += '公选：' + (a2c + courseTypeCredit.D + courseTypeCredit.E + courseTypeCredit.F) + '学分<br>';
-                text += '专选：' + ((result['专业选修课程'] || 0) + (result['19跨专业选修类（G）'] || 0)) + '学分<br>';
+                text += '专选：' + ((result['专业选修课程'] || 0) + (result['专业任意选修课'] || 0) + (result['19跨专业选修类（G)'] || 0)) + '学分<br>';
                 text += '<!--';
                 for (let key in result) {
                     text += key + '：' + result[key] + '学分<br>';
@@ -155,7 +155,8 @@
                 text += '<hr style="border: none; border-top: 1px solid #efefef; margin-bottom: 10px;">';
                 text += '必修课加权平均：' + avg.toFixed(2) + '分</div><br>';
                 div.innerHTML = text;
-                div.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; width: 26em; box-shadow: 0 1px 4px #00000047; z-index: 99999;';
+                div.style.cssText =
+                    'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; width: 26em; box-shadow: 0 1px 4px #00000047; z-index: 99999;';
 
                 // 添加关闭按钮
                 let closeBtn = document.createElement('button');
