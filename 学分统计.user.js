@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         学分统计
 // @namespace    https://github.com/Honoka55/hrbeu-credit-statistics
-// @version      0.24
+// @version      0.25
 // @description  自动统计课程学分
 // @author       Honoka55
 // @match        *://*.hrbeu.edu.cn/jwapp/sys/cjcx/*
