@@ -62,7 +62,7 @@
 
     // 点击按钮时执行
     btn.onclick = function () {
-        let rurl = 'https://' + window.location.host + '/jwapp/sys/cjcx/modules/cjcx/xscjcx.do';
+        let rurl = window.location.origin + '/jwapp/sys/cjcx/modules/cjcx/xscjcx.do';
         GM_xmlhttpRequest({
             method: 'POST',
             url: rurl,
