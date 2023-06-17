@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         学分统计
 // @namespace    https://github.com/Honoka55/hrbeu-credit-statistics
-// @version      0.25
+// @version      0.26
 // @description  自动统计课程学分
 // @author       Honoka55
 // @match        *://*.hrbeu.edu.cn/jwapp/sys/cjcx/*
@@ -148,7 +148,7 @@
                 let a2c = courseTypeCredit.A + courseTypeCredit.A0 + courseTypeCredit.B + courseTypeCredit.C;
                 text += 'A～C：' + a2c + '学分<br>';
                 text += '公选：' + (a2c + courseTypeCredit.D + courseTypeCredit.E + courseTypeCredit.F) + '学分<br>';
-                text += '专选：' + ((result['专业选修课程'] || 0) + (result['专业任意选修课'] || 0) + (result['19跨专业选修类（G)'] || 0)) + '学分<br>';
+                text += '专选：' + ((result['19专业选修课程'] || 0) + (result['19跨专业选修类（G)'] || 0)) + '学分<br>';
                 text += '<!--';
                 for (let key in result) {
                     text += key + '：' + result[key] + '学分<br>';
